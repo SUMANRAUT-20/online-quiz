@@ -2,7 +2,12 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { QuizClient } from "./QuizClient";
 import { getCurrentUser } from "../../lib/auth";
-import { getQuizQuestions, getQuizSummary, toClientQuestion } from "../../lib/db";
+import {
+  QUESTIONS_PER_ATTEMPT,
+  getQuizSummary,
+  getRandomQuizQuestions,
+  toClientQuestion,
+} from "../../lib/db";
 
 export default async function HtmlBasicQuizPage() {
   const user = await getCurrentUser();
@@ -12,7 +17,9 @@ export default async function HtmlBasicQuizPage() {
   }
 
   const quiz = await getQuizSummary();
-  const questions = (await getQuizQuestions(quiz.id)).map(toClientQuestion);
+  const questions = (await getRandomQuizQuestions(quiz.id)).map(
+    toClientQuestion,
+  );
 
   return (
     <main className="page-shell">
@@ -31,7 +38,10 @@ export default async function HtmlBasicQuizPage() {
         <section className="hero-section">
           <p className="eyebrow">Quiz</p>
           <h1>{quiz.title}</h1>
-          <p className="muted">{quiz.description}</p>
+          <p className="muted">
+            {quiz.description} You will get {QUESTIONS_PER_ATTEMPT} random
+            questions from {quiz.questionCount} total questions.
+          </p>
         </section>
 
         <QuizClient questions={questions} />

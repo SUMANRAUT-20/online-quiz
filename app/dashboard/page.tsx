@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LogoutButton } from "../components/LogoutButton";
 import { getCurrentUser } from "../lib/auth";
-import { getQuizSummary } from "../lib/db";
+import { QUESTIONS_PER_ATTEMPT, getQuizSummary } from "../lib/db";
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
@@ -50,10 +50,13 @@ export default async function DashboardPage() {
               <div className="quiz-card-header">
                 <div>
                   <h3>{quiz.title}</h3>
-                  <p className="quiz-meta">{quiz.description}</p>
+                  <p className="quiz-meta">
+                    {quiz.description} {quiz.questionCount} total questions in
+                    the bank.
+                  </p>
                 </div>
                 <span className="badge">
-                  {quiz.questionCount} Questions
+                  {QUESTIONS_PER_ATTEMPT} Questions
                 </span>
               </div>
               <Link

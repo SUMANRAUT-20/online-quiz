@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "../lib/auth";
-import { getQuizSummary } from "../lib/db";
+import { QUESTIONS_PER_ATTEMPT, getQuizSummary } from "../lib/db";
 
 export default async function QuizzesPage() {
   const user = await getCurrentUser();
@@ -39,10 +39,13 @@ export default async function QuizzesPage() {
             <div className="quiz-card-header">
               <div>
                 <h2>{quiz.title}</h2>
-                <p className="quiz-meta">{quiz.description}</p>
+                <p className="quiz-meta">
+                  {quiz.description} {quiz.questionCount} total questions in
+                  the bank.
+                </p>
               </div>
               <span className="badge">
-                {quiz.questionCount} Questions
+                {QUESTIONS_PER_ATTEMPT} Questions
               </span>
             </div>
             <Link

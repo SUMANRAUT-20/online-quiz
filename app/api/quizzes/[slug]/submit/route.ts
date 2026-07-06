@@ -18,20 +18,27 @@ export async function POST(
     answers?: Record<string, QuizOptionKey>;
   };
   const answers = body.answers ?? {};
+  const answeredQuestionIds = Object.keys(answers);
   const questions = await getQuizQuestions(slug);
+  const answeredQuestions = questions.filter((question) =>
+    answeredQuestionIds.includes(String(question.id)),
+  );
 
   if (questions.length === 0) {
     return NextResponse.json({ error: "Quiz not found." }, { status: 404 });
   }
 
-  if (Object.keys(answers).length !== questions.length) {
+  if (
+    answeredQuestionIds.length === 0 ||
+    answeredQuestionIds.length !== answeredQuestions.length
+  ) {
     return NextResponse.json(
       { error: "Please answer all questions before submitting." },
       { status: 400 },
     );
   }
 
-  const score = questions.reduce((total, question) => {
+  const score = answeredQuestions.reduce((total, question) => {
     return total + (answers[String(question.id)] === question.correct_option ? 1 : 0);
   }, 0);
 
@@ -39,7 +46,7 @@ export async function POST(
     quizSlug: slug,
     quizTitle: htmlBasicQuiz.title,
     score,
-    total: questions.length,
+    total: answeredQuestions.length,
     userId: user.id,
   });
 
@@ -48,7 +55,7 @@ export async function POST(
       quizId: slug,
       quizTitle: htmlBasicQuiz.title,
       score,
-      total: questions.length,
+      total: answeredQuestions.length,
       completedAt: new Date().toISOString(),
     },
   });

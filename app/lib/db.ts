@@ -4,6 +4,8 @@ import mysql, {
 } from "mysql2/promise";
 import { htmlBasicQuiz } from "./quizData";
 
+export const QUESTIONS_PER_ATTEMPT = 5;
+
 export type User = {
   id: number;
   name: string;
@@ -298,6 +300,25 @@ export async function getQuizQuestions(slug = htmlBasicQuiz.id) {
      FROM questions
      WHERE quiz_slug = ?
      ORDER BY id ASC`,
+    [slug],
+  );
+
+  return rows;
+}
+
+export async function getRandomQuizQuestions(
+  slug = htmlBasicQuiz.id,
+  limit = QUESTIONS_PER_ATTEMPT,
+) {
+  await ensureDatabase();
+
+  const questionLimit = Math.max(1, Math.min(Math.floor(limit), 50));
+  const [rows] = await getPool().execute<QuestionRow[]>(
+    `SELECT id, quiz_slug, question, option_a, option_b, option_c, option_d, correct_option
+     FROM questions
+     WHERE quiz_slug = ?
+     ORDER BY RAND()
+     LIMIT ${questionLimit}`,
     [slug],
   );
 
