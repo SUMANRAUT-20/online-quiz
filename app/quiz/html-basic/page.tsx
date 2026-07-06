@@ -9,6 +9,9 @@ import {
   toClientQuestion,
 } from "../../lib/db";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function HtmlBasicQuizPage() {
   const user = await getCurrentUser();
 

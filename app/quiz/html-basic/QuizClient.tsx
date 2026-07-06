@@ -5,12 +5,15 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import type { QuizOptionKey, QuizQuestionForClient } from "../../lib/db";
 
+const QUESTIONS_PER_ATTEMPT = 5;
+
 export function QuizClient({
   questions,
 }: {
   questions: QuizQuestionForClient[];
 }) {
   const router = useRouter();
+  const displayedQuestions = questions.slice(0, QUESTIONS_PER_ATTEMPT);
   const [answers, setAnswers] = useState<Record<number, QuizOptionKey>>({});
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -18,7 +21,7 @@ export function QuizClient({
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (Object.keys(answers).length !== questions.length) {
+    if (Object.keys(answers).length !== displayedQuestions.length) {
       setError("Please answer all questions before submitting.");
       return;
     }
@@ -48,7 +51,7 @@ export function QuizClient({
   return (
     <form onSubmit={handleSubmit}>
       <div className="question-list">
-        {questions.map((question, index) => (
+        {displayedQuestions.map((question, index) => (
           <section className="question-card" key={question.id}>
             <p className="question-title">
               {index + 1}. {question.question}
@@ -82,7 +85,7 @@ export function QuizClient({
 
       <div className="quiz-footer">
         <p className="muted">
-          Answered {Object.keys(answers).length} of {questions.length}
+          Answered {Object.keys(answers).length} of {displayedQuestions.length}
         </p>
         <button
           className="button button-primary"
